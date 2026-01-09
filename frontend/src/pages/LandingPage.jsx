@@ -1,5 +1,5 @@
-import React from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import React, { useRef } from "react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
 import { useAuth } from "@/App";
 import { useNavigate } from "react-router-dom";
 import { 
@@ -10,7 +10,6 @@ import {
   Cloud,
   Download,
   Shield,
-  Clock,
   Globe,
   X,
   Heart
@@ -55,6 +54,56 @@ const features = [
   }
 ];
 
+// Text Reveal Component for Thank You modal
+function TextRevealTitle({ text }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 0.9", "start 0.5"]
+  });
+
+  const words = text.split(' ');
+
+  return (
+    <h2 ref={ref} className="text-2xl md:text-3xl font-semibold text-white flex flex-wrap justify-center gap-x-2">
+      {words.map((word, i) => {
+        const start = i / words.length;
+        const end = start + 1 / words.length;
+        return <TextRevealWord key={i} progress={scrollYProgress} range={[start, end]}>{word}</TextRevealWord>;
+      })}
+    </h2>
+  );
+}
+
+function TextRevealWord({ children, progress, range }) {
+  const opacity = useTransform(progress, range, [0.2, 1]);
+  const y = useTransform(progress, range, [10, 0]);
+
+  return (
+    <motion.span style={{ opacity, y }} className="inline-block">
+      {children}
+    </motion.span>
+  );
+}
+
+// Text Reveal for description
+function TextRevealDescription({ children }) {
+  const ref = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start 0.95", "start 0.6"]
+  });
+  
+  const opacity = useTransform(scrollYProgress, [0, 1], [0.3, 1]);
+  const y = useTransform(scrollYProgress, [0, 1], [20, 0]);
+
+  return (
+    <motion.div ref={ref} style={{ opacity, y }}>
+      {children}
+    </motion.div>
+  );
+}
+
 export default function LandingPage() {
   const { user, login, showThankYou, setShowThankYou } = useAuth();
   const navigate = useNavigate();
@@ -76,20 +125,20 @@ export default function LandingPage() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-sm p-6"
+            className="fixed inset-0 z-[100] flex items-start justify-center bg-black/95 backdrop-blur-sm overflow-y-auto py-8"
             onClick={() => setShowThankYou(false)}
           >
             <motion.div
-              initial={{ scale: 0.9, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.9, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
               transition={{ type: 'spring', damping: 25 }}
-              className="relative max-w-2xl w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-12 max-h-[90vh] overflow-y-auto"
+              className="relative max-w-2xl w-full mx-4 bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-12 my-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <button
                 onClick={() => setShowThankYou(false)}
-                className="absolute top-4 right-4 p-2 rounded-full hover:bg-zinc-800 transition-colors"
+                className="absolute top-4 right-4 p-2 rounded-full hover:bg-zinc-800 transition-colors z-10"
                 data-testid="close-thank-you"
               >
                 <X className="w-5 h-5 text-zinc-400" />
@@ -110,31 +159,65 @@ export default function LandingPage() {
                   <span>A Personal Note</span>
                 </div>
 
-                <h2 className="text-2xl md:text-3xl font-semibold text-white">
+                {/* Text Reveal Title */}
+                <motion.h2
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.2, duration: 0.6 }}
+                  className="text-2xl md:text-3xl font-semibold text-white"
+                >
                   Thank You, Uplane Team
-                </h2>
+                </motion.h2>
 
-                <div className="space-y-4 text-zinc-400 text-left leading-relaxed">
-                  <p>
+                {/* Text Reveal Description */}
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.4, duration: 0.8 }}
+                  className="space-y-4 text-zinc-400 text-left leading-relaxed"
+                >
+                  <motion.p
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                  >
                     <span className="text-white font-medium">To Mr. Marvin</span> — Thank you for giving me the chance to connect with you on LinkedIn and for the opportunity to interview at Uplane. Your openness to hear from aspiring developers means the world.
-                  </p>
+                  </motion.p>
                   
-                  <p>
-                    <span className="text-white font-medium">To Mr. Julius</span> — Thank you for the insightful interview today. Learning about what Uplane does, how it works, and the impact you're creating was truly inspiring. It was a delightful conversation that reinforced my excitement about this opportunity.
-                  </p>
+                  <motion.p
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.7 }}
+                  >
+                    <span className="text-white font-medium">To Mr. Julius</span> — Thank you for the insightful interview. Learning about what Uplane does, how it works, and the impact you're creating was truly inspiring. It was a delightful conversation that reinforced my excitement about this opportunity.
+                  </motion.p>
                   
-                  <p>
+                  <motion.p
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.9 }}
+                  >
                     <span className="text-white font-medium">To Mr. Lukas</span> — Thank you for the take-home assignment. Building FlipCut was a great way to showcase my skills, and I genuinely enjoyed the challenge.
-                  </p>
+                  </motion.p>
 
-                  <p className="text-white font-medium pt-4 text-center">
+                  <motion.p
+                    initial={{ opacity: 0, y: 15 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 1.1 }}
+                    className="text-white font-medium pt-4 text-center"
+                  >
                     I'm excited about the opportunity to speak with you soon! 🚀
-                  </p>
-                </div>
+                  </motion.p>
+                </motion.div>
 
-                <div className="pt-6">
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 1.3 }}
+                  className="pt-6"
+                >
                   <a
-                    href="https://my-portfolio-sainath-gandhes-projects.vercel.app/"
+                    href="https://drive.google.com/file/d/1hCMZT19cyj_4rixefSKHuNDy0DpbImHN/view?usp=sharing"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-6 py-3 bg-white text-black rounded-full font-medium hover:bg-zinc-200 transition-colors"
@@ -143,7 +226,7 @@ export default function LandingPage() {
                     Want to know more about my skills?
                     <ArrowUpRight className="w-4 h-4" />
                   </a>
-                </div>
+                </motion.div>
               </div>
             </motion.div>
           </motion.div>
@@ -157,16 +240,6 @@ export default function LandingPage() {
         <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-white/[0.02] rounded-full blur-[100px]" />
 
         <div className="max-w-5xl mx-auto relative z-10">
-          <ScrollReveal>
-            <div className="flex items-center gap-2 mb-8">
-              <span className="px-3 py-1 rounded-full bg-zinc-900 border border-zinc-800 text-xs text-zinc-400">
-                Powered by AI
-              </span>
-              <span className="text-zinc-600">•</span>
-              <span className="text-xs text-zinc-500">50 free images/month</span>
-            </div>
-          </ScrollReveal>
-
           {/* Magnetic Headline */}
           <div className="mb-8">
             <ScrollReveal delay={0.1}>
@@ -249,7 +322,7 @@ export default function LandingPage() {
               <SpotlightCard 
                 key={index}
                 className="p-6 rounded-2xl bg-zinc-900/50 border-zinc-800"
-                spotlightColor="rgba(255, 255, 255, 0.05)"
+                spotlightColor="rgba(56, 189, 248, 0.15)"
               >
                 <div className="w-10 h-10 rounded-xl bg-zinc-800 flex items-center justify-center mb-4">
                   <feature.icon className="w-5 h-5 text-white" />
@@ -274,19 +347,25 @@ export default function LandingPage() {
             </div>
           </ScrollReveal>
 
-          <StaggerReveal className="space-y-8" staggerDelay={0.15}>
+          <StaggerReveal className="space-y-6" staggerDelay={0.15}>
             {[
               { step: '01', title: 'Upload', desc: 'Drag and drop your image or click to browse. We support PNG, JPEG, and WebP.' },
               { step: '02', title: 'Process', desc: 'Our AI removes the background and applies a horizontal flip automatically.' },
               { step: '03', title: 'Download', desc: 'Get your processed image instantly. Share it or download in high quality.' }
             ].map((item, index) => (
-              <div key={index} className="flex items-start gap-6 p-6 rounded-2xl bg-zinc-900/30 border border-zinc-900 hover:border-zinc-800 transition-colors">
-                <div className="text-4xl font-semibold text-zinc-800">{item.step}</div>
-                <div>
-                  <h3 className="text-xl font-medium text-white mb-2">{item.title}</h3>
-                  <p className="text-zinc-500">{item.desc}</p>
+              <SpotlightCard 
+                key={index} 
+                className="p-6 rounded-2xl bg-zinc-900/30 border-zinc-900"
+                spotlightColor="rgba(56, 189, 248, 0.1)"
+              >
+                <div className="flex items-start gap-6">
+                  <div className="text-4xl font-semibold text-zinc-700">{item.step}</div>
+                  <div>
+                    <h3 className="text-xl font-medium text-white mb-2">{item.title}</h3>
+                    <p className="text-zinc-500">{item.desc}</p>
+                  </div>
                 </div>
-              </div>
+              </SpotlightCard>
             ))}
           </StaggerReveal>
         </div>
@@ -326,17 +405,7 @@ export default function LandingPage() {
             </div>
             <span className="text-sm text-zinc-500">FlipCut © {new Date().getFullYear()}</span>
           </div>
-          <div className="flex items-center gap-6">
-            <a 
-              href="https://my-portfolio-sainath-gandhes-projects.vercel.app/" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-sm text-zinc-500 hover:text-white transition-colors flex items-center gap-1"
-            >
-              Portfolio <ArrowUpRight className="w-3 h-3" />
-            </a>
-            <span className="text-sm text-zinc-600">Built with care for Uplane</span>
-          </div>
+          <span className="text-sm text-zinc-600">Built with care for Uplane</span>
         </div>
       </footer>
     </div>
