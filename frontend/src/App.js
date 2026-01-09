@@ -24,6 +24,7 @@ export const apiClient = axios.create({
 export const AuthContext = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [showThankYou, setShowThankYou] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -66,14 +67,14 @@ export const AuthContext = ({ children }) => {
   };
 
   return (
-    <AuthProvider value={{ user, setUser, loading, login, logout }}>
+    <AuthProvider value={{ user, setUser, loading, login, logout, showThankYou, setShowThankYou }}>
       {children}
     </AuthProvider>
   );
 };
 
 // Simple context provider
-const AuthContextValue = { user: null, setUser: () => {}, loading: true, login: () => {}, logout: () => {} };
+const AuthContextValue = { user: null, setUser: () => {}, loading: true, login: () => {}, logout: () => {}, showThankYou: false, setShowThankYou: () => {} };
 const AuthProviderContext = React.createContext(AuthContextValue);
 
 const AuthProvider = ({ children, value }) => {
@@ -90,6 +91,12 @@ export const useAuth = () => {
     throw new Error("useAuth must be used within AuthProvider");
   }
   return context;
+};
+
+// Navbar wrapper
+const NavbarWrapper = () => {
+  const { setShowThankYou } = useAuth();
+  return <Navbar onOpenThankYou={() => setShowThankYou(true)} />;
 };
 
 // Router wrapper to detect session_id
@@ -114,10 +121,10 @@ import React from "react";
 
 function App() {
   return (
-    <div className="min-h-screen bg-[#050505] grain relative overflow-x-hidden">
+    <div className="min-h-screen bg-black overflow-x-hidden">
       <BrowserRouter>
         <AuthContext>
-          <Navbar />
+          <NavbarWrapper />
           <main className="relative z-10">
             <AnimatePresence mode="wait">
               <AppRouter />
@@ -130,8 +137,8 @@ function App() {
         position="bottom-right"
         toastOptions={{
           style: {
-            background: '#0a0a0f',
-            border: '1px solid rgba(255,255,255,0.1)',
+            background: '#18181b',
+            border: '1px solid #27272a',
             color: '#fff',
           },
         }}
