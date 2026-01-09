@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useAuth } from "@/App";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +6,6 @@ import {
   ArrowRight,
   ArrowUpRight,
   Sparkles,
-  Image as ImageIcon,
   Zap,
   Cloud,
   Download,
@@ -18,9 +17,9 @@ import {
 } from "lucide-react";
 
 // Effects components
-import { MagneticHeadline, MagneticCharacter } from "@/components/effects/MagneticText";
-import { ScrollReveal, StaggerReveal, TextReveal } from "@/components/effects/ScrollReveal";
-import { NavigationTabs, SpotlightButton, OutlineButton } from "@/components/effects/NavigationTabs";
+import { MagneticHeadline } from "@/components/effects/MagneticText";
+import { ScrollReveal, StaggerReveal } from "@/components/effects/ScrollReveal";
+import { SpotlightButton, OutlineButton } from "@/components/effects/NavigationTabs";
 import { SpotlightCard } from "@/components/effects/SpotlightCard";
 
 const features = [
@@ -56,17 +55,9 @@ const features = [
   }
 ];
 
-const navTabs = [
-  { id: 'features', label: 'Features' },
-  { id: 'pricing', label: 'Pricing' },
-  { id: 'about', label: 'About' },
-];
-
 export default function LandingPage() {
-  const { user, login } = useAuth();
+  const { user, login, showThankYou, setShowThankYou } = useAuth();
   const navigate = useNavigate();
-  const [activeTab, setActiveTab] = useState('features');
-  const [showThankYou, setShowThankYou] = useState(false);
 
   const handleGetStarted = () => {
     if (user) {
@@ -93,7 +84,7 @@ export default function LandingPage() {
               animate={{ scale: 1, opacity: 1 }}
               exit={{ scale: 0.9, opacity: 0 }}
               transition={{ type: 'spring', damping: 25 }}
-              className="relative max-w-2xl w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-12"
+              className="relative max-w-2xl w-full bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-12 max-h-[90vh] overflow-y-auto"
               onClick={(e) => e.stopPropagation()}
             >
               <button
@@ -158,50 +149,6 @@ export default function LandingPage() {
           </motion.div>
         )}
       </AnimatePresence>
-
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-black/80 backdrop-blur-md border-b border-zinc-900">
-        <div className="max-w-6xl mx-auto flex items-center justify-between">
-          {/* Left - Thank You Button */}
-          <button
-            onClick={() => setShowThankYou(true)}
-            className="flex items-center gap-2 px-4 py-2 rounded-full bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-colors text-sm"
-            data-testid="thank-uplane-btn"
-          >
-            <Heart className="w-4 h-4 text-red-500" />
-            <span className="text-zinc-300">For Uplane</span>
-          </button>
-
-          {/* Center - Logo */}
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center">
-              <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
-                <path d="M4 4L10 12L4 20H8L14 12L8 4H4Z" fill="black"/>
-                <path d="M12 4L18 12L12 20H16L22 12L16 4H12Z" fill="black" fillOpacity="0.5"/>
-              </svg>
-            </div>
-            <span className="text-lg font-semibold text-white tracking-tight">FlipCut</span>
-          </div>
-
-          {/* Right - Nav + CTA */}
-          <div className="flex items-center gap-4">
-            <div className="hidden md:block">
-              <NavigationTabs 
-                tabs={navTabs} 
-                activeTab={activeTab} 
-                onChange={setActiveTab}
-              />
-            </div>
-            <SpotlightButton
-              onClick={handleGetStarted}
-              data-testid="nav-get-started-btn"
-              className="text-sm px-5 py-2"
-            >
-              {user ? 'Dashboard' : 'Get Started'}
-            </SpotlightButton>
-          </div>
-        </div>
-      </nav>
 
       {/* Hero Section */}
       <section className="relative px-6 pt-32 pb-24 md:pt-40 md:pb-32">
