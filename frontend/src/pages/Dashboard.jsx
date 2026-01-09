@@ -5,7 +5,6 @@ import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
 import { apiClient, useAuth } from "@/App";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import {
   Dialog,
   DialogContent,
@@ -25,25 +24,18 @@ import {
   XCircle,
   AlertCircle,
   RefreshCw,
-  Scissors,
-  FlipHorizontal2,
-  Cloud,
   Sparkles,
-  ImagePlus,
   FolderOpen,
 } from "lucide-react";
 
-// Effects
+import { ScrollReveal } from "@/components/effects/ScrollReveal";
 import { SpotlightCard } from "@/components/effects/SpotlightCard";
-import { GridPattern, DotPattern } from "@/components/effects/GridPattern";
-import { BeforeAfterSlider } from "@/components/effects/BeforeAfterSlider";
-import { GlowButton } from "@/components/effects/AnimatedButtons";
 
 const PROCESSING_STEPS = [
-  { key: "upload", label: "Uploading", icon: Upload, color: "text-blue-400" },
-  { key: "removing", label: "Removing Background", icon: Scissors, color: "text-violet-400" },
-  { key: "flipping", label: "Flipping", icon: FlipHorizontal2, color: "text-cyan-400" },
-  { key: "saving", label: "Saving to Cloud", icon: Cloud, color: "text-emerald-400" },
+  { key: "upload", label: "Uploading", icon: Upload },
+  { key: "removing", label: "Removing Background", icon: Sparkles },
+  { key: "flipping", label: "Flipping", icon: RefreshCw },
+  { key: "saving", label: "Saving", icon: CheckCircle },
 ];
 
 export default function Dashboard() {
@@ -114,8 +106,6 @@ export default function Dashboard() {
       toast.success("Image uploaded! Starting processing...");
 
       setProcessing(imageId);
-      
-      // Simulate step progression for better UX
       setProcessingStep(1);
       await new Promise(r => setTimeout(r, 500));
       setProcessingStep(2);
@@ -214,384 +204,292 @@ export default function Dashboard() {
 
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <Loader2 className="w-8 h-8 text-[#7c3aed] animate-spin" />
+      <div className="min-h-screen flex items-center justify-center bg-black">
+        <Loader2 className="w-8 h-8 text-white animate-spin" />
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6 relative" data-testid="dashboard">
+    <div className="min-h-screen pt-24 pb-12 px-6 bg-black" data-testid="dashboard">
       {/* Background */}
-      <div className="fixed inset-0 pointer-events-none">
-        <DotPattern className="opacity-30" />
-        <div className="absolute top-1/4 right-0 w-96 h-96 bg-[#7c3aed]/10 rounded-full blur-[150px]" />
-        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-[#06b6d4]/10 rounded-full blur-[150px]" />
-      </div>
+      <div className="fixed inset-0 pointer-events-none dot-pattern opacity-30" />
 
-      <div className="max-w-6xl mx-auto relative z-10">
+      <div className="max-w-5xl mx-auto relative z-10">
         {/* Header */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-10"
-        >
-          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
-            Your Images
-          </h1>
-          <p className="text-zinc-400 text-lg">
-            Upload, process, and manage your images
-          </p>
-        </motion.div>
+        <ScrollReveal>
+          <div className="mb-10">
+            <h1 className="text-3xl md:text-4xl font-semibold text-white mb-2">
+              Your Images
+            </h1>
+            <p className="text-zinc-500">
+              Upload, process, and manage your images
+            </p>
+          </div>
+        </ScrollReveal>
 
         {/* Upload Zone */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.1 }}
-          className="mb-12"
-        >
+        <ScrollReveal delay={0.1}>
           <div
             {...getRootProps()}
-            className={`relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer
+            className={`relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer mb-12
               ${isDragActive 
-                ? 'border-[#7c3aed] bg-[#7c3aed]/10 scale-[1.02]' 
-                : 'border-white/10 hover:border-[#7c3aed]/50 hover:bg-white/[0.02]'
+                ? 'border-white bg-zinc-900/50 scale-[1.02]' 
+                : 'border-zinc-800 hover:border-zinc-700 hover:bg-zinc-900/30'
               }
               ${uploading || processing ? 'opacity-80 cursor-not-allowed' : ''}
             `}
             data-testid="upload-zone"
           >
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-50">
-              <GridPattern width={30} height={30} />
-            </div>
-
-            <div className="relative p-12 lg:p-16 text-center">
+            <div className="p-12 lg:p-16 text-center">
               <input {...getInputProps()} data-testid="file-input" />
               
               {uploading || processing ? (
                 <div className="space-y-6">
-                  {/* Processing Animation */}
-                  <div className="relative w-20 h-20 mx-auto">
-                    <div className="absolute inset-0 rounded-full bg-[#7c3aed]/20 animate-ping" />
-                    <div className="relative w-20 h-20 rounded-full bg-[#7c3aed]/10 flex items-center justify-center">
-                      <Sparkles className="w-10 h-10 text-[#7c3aed] animate-pulse" />
+                  <div className="relative w-16 h-16 mx-auto">
+                    <div className="absolute inset-0 rounded-full bg-white/10 animate-ping" />
+                    <div className="relative w-16 h-16 rounded-full bg-zinc-900 border border-zinc-800 flex items-center justify-center">
+                      <Sparkles className="w-8 h-8 text-white animate-pulse" />
                     </div>
                   </div>
 
-                  {/* Processing Steps */}
-                  <div className="space-y-4">
-                    <p className="text-white font-semibold text-lg">
+                  <div className="space-y-3">
+                    <p className="text-white font-medium text-lg">
                       {PROCESSING_STEPS[processingStep]?.label || "Processing..."}
                     </p>
                     
-                    {/* Step Progress */}
-                    <div className="flex items-center justify-center gap-3">
-                      {PROCESSING_STEPS.map((step, index) => {
-                        const StepIcon = step.icon;
-                        const isActive = index === processingStep;
-                        const isComplete = index < processingStep;
-                        
-                        return (
-                          <div key={step.key} className="flex items-center">
-                            <div className={`
-                              w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
-                              ${isActive ? 'bg-[#7c3aed] scale-110' : ''}
-                              ${isComplete ? 'bg-emerald-500' : ''}
-                              ${!isActive && !isComplete ? 'bg-white/10' : ''}
-                            `}>
-                              {isComplete ? (
-                                <CheckCircle className="w-5 h-5 text-white" />
-                              ) : (
-                                <StepIcon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-zinc-500'}`} />
-                              )}
-                            </div>
-                            {index < PROCESSING_STEPS.length - 1 && (
-                              <div className={`w-8 h-0.5 mx-1 ${isComplete ? 'bg-emerald-500' : 'bg-white/10'}`} />
-                            )}
-                          </div>
-                        );
-                      })}
+                    <div className="flex items-center justify-center gap-2">
+                      {PROCESSING_STEPS.map((step, index) => (
+                        <div
+                          key={step.key}
+                          className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                            index <= processingStep ? 'bg-white' : 'bg-zinc-700'
+                          }`}
+                        />
+                      ))}
                     </div>
                   </div>
                 </div>
               ) : (
                 <>
-                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#06b6d4] flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#7c3aed]/20">
-                    <Upload className="w-10 h-10 text-white" />
+                  <div className="w-16 h-16 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center mx-auto mb-6">
+                    <Upload className="w-8 h-8 text-white" />
                   </div>
-                  <p className="text-white font-semibold text-xl mb-2">
+                  <p className="text-white font-medium text-lg mb-2">
                     {isDragActive ? "Drop your image here" : "Drag & drop to upload"}
                   </p>
-                  <p className="text-zinc-500 mb-4">
+                  <p className="text-zinc-600 text-sm mb-4">
                     or click to select from your computer
                   </p>
-                  <div className="flex items-center justify-center gap-4 text-xs text-zinc-600">
-                    <span className="px-2 py-1 rounded bg-white/5">PNG</span>
-                    <span className="px-2 py-1 rounded bg-white/5">JPEG</span>
-                    <span className="px-2 py-1 rounded bg-white/5">WebP</span>
-                    <span className="px-2 py-1 rounded bg-white/5">Max 8MB</span>
+                  <div className="flex items-center justify-center gap-3 text-xs text-zinc-600">
+                    <span className="px-2 py-1 rounded bg-zinc-900 border border-zinc-800">PNG</span>
+                    <span className="px-2 py-1 rounded bg-zinc-900 border border-zinc-800">JPEG</span>
+                    <span className="px-2 py-1 rounded bg-zinc-900 border border-zinc-800">WebP</span>
+                    <span className="px-2 py-1 rounded bg-zinc-900 border border-zinc-800">Max 8MB</span>
                   </div>
                 </>
               )}
             </div>
           </div>
-        </motion.div>
+        </ScrollReveal>
 
-        {/* Images Gallery */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.2 }}
-        >
+        {/* Gallery */}
+        <ScrollReveal delay={0.2}>
           <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-semibold text-white flex items-center gap-3">
-              <FolderOpen className="w-6 h-6 text-[#7c3aed]" />
+            <h2 className="text-xl font-medium text-white flex items-center gap-2">
+              <FolderOpen className="w-5 h-5 text-zinc-500" />
               Gallery
             </h2>
             {images.length > 0 && (
-              <span className="text-sm text-zinc-500">{images.length} images</span>
+              <span className="text-sm text-zinc-600">{images.length} images</span>
             )}
           </div>
+        </ScrollReveal>
           
-          {loading ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {[1, 2, 3].map((i) => (
-                <div key={i} className="aspect-square rounded-2xl bg-white/5 animate-pulse" />
-              ))}
-            </div>
-          ) : images.length === 0 ? (
-            <SpotlightCard className="py-16">
-              <div className="text-center">
-                <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-6">
-                  <ImageIcon className="w-10 h-10 text-zinc-600" />
-                </div>
-                <h3 className="text-xl font-medium text-white mb-2">No images yet</h3>
-                <p className="text-zinc-500 mb-6">
-                  Upload your first image to get started
-                </p>
-                <GlowButton
-                  onClick={() => document.querySelector('[data-testid="upload-zone"]')?.click()}
-                  className="px-6 py-3"
-                >
-                  <ImagePlus className="w-5 h-5 mr-2" />
-                  Upload Image
-                </GlowButton>
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="aspect-square rounded-2xl bg-zinc-900 animate-pulse" />
+            ))}
+          </div>
+        ) : images.length === 0 ? (
+          <SpotlightCard className="py-16 bg-zinc-900/50 border-zinc-800" spotlightColor="rgba(255,255,255,0.03)">
+            <div className="text-center">
+              <div className="w-16 h-16 rounded-2xl bg-zinc-800 flex items-center justify-center mx-auto mb-6">
+                <ImageIcon className="w-8 h-8 text-zinc-600" />
               </div>
-            </SpotlightCard>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <AnimatePresence>
-                {images.map((image, index) => (
-                  <motion.div
-                    key={image.image_id}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.9 }}
-                    transition={{ delay: index * 0.05 }}
-                    className="group relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#7c3aed]/50 transition-all duration-300 hover:shadow-xl hover:shadow-[#7c3aed]/10"
-                    data-testid={`image-card-${image.image_id}`}
-                  >
-                    {/* Image Preview */}
-                    <div 
-                      className="aspect-square relative bg-checkered cursor-pointer overflow-hidden"
-                      onClick={() => setSelectedImage(image)}
-                    >
-                      <img
-                        src={image.processed_url || image.original_url}
-                        alt={image.original_filename}
-                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
-                      />
-                      
-                      {/* Status Badge */}
-                      <div className="absolute top-3 right-3">
-                        {image.status === "PROCESSED" && (
-                          <div className="bg-emerald-500/20 backdrop-blur-sm text-emerald-400 px-3 py-1 rounded-full text-xs flex items-center gap-1.5 border border-emerald-500/30">
-                            <CheckCircle className="w-3.5 h-3.5" />
-                            Processed
-                          </div>
-                        )}
-                        {image.status === "PROCESSING" && (
-                          <div className="bg-[#7c3aed]/20 backdrop-blur-sm text-[#7c3aed] px-3 py-1 rounded-full text-xs flex items-center gap-1.5 border border-[#7c3aed]/30">
-                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                            Processing
-                          </div>
-                        )}
-                        {image.status === "FAILED" && (
-                          <div className="bg-red-500/20 backdrop-blur-sm text-red-400 px-3 py-1 rounded-full text-xs flex items-center gap-1.5 border border-red-500/30">
-                            <XCircle className="w-3.5 h-3.5" />
-                            Failed
-                          </div>
-                        )}
-                        {image.status === "UPLOADED" && (
-                          <div className="bg-amber-500/20 backdrop-blur-sm text-amber-400 px-3 py-1 rounded-full text-xs flex items-center gap-1.5 border border-amber-500/30">
-                            <AlertCircle className="w-3.5 h-3.5" />
-                            Pending
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center p-4">
-                        <div className="flex items-center gap-2">
-                          {image.processed_url && (
-                            <>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleCopyLink(image.processed_url);
-                                }}
-                                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110"
-                                title="Copy link"
-                                data-testid={`copy-link-${image.image_id}`}
-                              >
-                                <Link2 className="w-4 h-4 text-white" />
-                              </button>
-                              <button
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleDownload(image.processed_url, `flipcut-${image.image_id}.png`);
-                                }}
-                                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110"
-                                title="Download"
-                                data-testid={`download-${image.image_id}`}
-                              >
-                                <Download className="w-4 h-4 text-white" />
-                              </button>
-                            </>
-                          )}
-                          {(image.status === "FAILED" || image.status === "UPLOADED") && (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRetry(image.image_id);
-                              }}
-                              className="w-10 h-10 rounded-full bg-[#7c3aed]/50 hover:bg-[#7c3aed] backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110"
-                              title="Retry processing"
-                              data-testid={`retry-${image.image_id}`}
-                            >
-                              <RefreshCw className="w-4 h-4 text-white" />
-                            </button>
-                          )}
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setDeleteDialog({ open: true, imageId: image.image_id });
-                            }}
-                            className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/40 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110"
-                            title="Delete"
-                            data-testid={`delete-${image.image_id}`}
-                          >
-                            <Trash2 className="w-4 h-4 text-red-400" />
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Image Info */}
-                    <div className="p-4 border-t border-white/5">
-                      <p className="text-sm text-white truncate font-medium mb-1">
-                        {image.original_filename}
-                      </p>
-                      <p className="text-xs text-zinc-500">
-                        {new Date(image.created_at).toLocaleDateString('en-US', {
-                          month: 'short',
-                          day: 'numeric',
-                          year: 'numeric'
-                        })}
-                      </p>
-                    </div>
-                  </motion.div>
-                ))}
-              </AnimatePresence>
+              <h3 className="text-lg font-medium text-white mb-2">No images yet</h3>
+              <p className="text-zinc-600 text-sm">
+                Upload your first image to get started
+              </p>
             </div>
-          )}
-        </motion.div>
+          </SpotlightCard>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <AnimatePresence>
+              {images.map((image, index) => (
+                <motion.div
+                  key={image.image_id}
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ delay: index * 0.05 }}
+                  className="group relative rounded-2xl overflow-hidden bg-zinc-900 border border-zinc-800 hover:border-zinc-700 transition-all duration-300"
+                  data-testid={`image-card-${image.image_id}`}
+                >
+                  <div 
+                    className="aspect-square relative bg-checkered cursor-pointer overflow-hidden"
+                    onClick={() => setSelectedImage(image)}
+                  >
+                    <img
+                      src={image.processed_url || image.original_url}
+                      alt={image.original_filename}
+                      className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
+                    />
+                    
+                    {/* Status Badge */}
+                    <div className="absolute top-3 right-3">
+                      {image.status === "PROCESSED" && (
+                        <div className="bg-zinc-900/80 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5 border border-zinc-700">
+                          <CheckCircle className="w-3 h-3" />
+                          Done
+                        </div>
+                      )}
+                      {image.status === "PROCESSING" && (
+                        <div className="bg-zinc-900/80 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5 border border-zinc-700">
+                          <Loader2 className="w-3 h-3 animate-spin" />
+                          Processing
+                        </div>
+                      )}
+                      {image.status === "FAILED" && (
+                        <div className="bg-red-900/80 backdrop-blur-sm text-red-300 px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5 border border-red-800">
+                          <XCircle className="w-3 h-3" />
+                          Failed
+                        </div>
+                      )}
+                      {image.status === "UPLOADED" && (
+                        <div className="bg-zinc-900/80 backdrop-blur-sm text-zinc-400 px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5 border border-zinc-700">
+                          <AlertCircle className="w-3 h-3" />
+                          Pending
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Hover Actions */}
+                    <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2">
+                      {image.processed_url && (
+                        <>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleCopyLink(image.processed_url); }}
+                            className="w-10 h-10 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-all"
+                            title="Copy link"
+                            data-testid={`copy-link-${image.image_id}`}
+                          >
+                            <Link2 className="w-4 h-4 text-white" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); handleDownload(image.processed_url, `flipcut-${image.image_id}.png`); }}
+                            className="w-10 h-10 rounded-full bg-zinc-800 hover:bg-zinc-700 flex items-center justify-center transition-all"
+                            title="Download"
+                            data-testid={`download-${image.image_id}`}
+                          >
+                            <Download className="w-4 h-4 text-white" />
+                          </button>
+                        </>
+                      )}
+                      {(image.status === "FAILED" || image.status === "UPLOADED") && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); handleRetry(image.image_id); }}
+                          className="w-10 h-10 rounded-full bg-white hover:bg-zinc-200 flex items-center justify-center transition-all"
+                          title="Retry"
+                          data-testid={`retry-${image.image_id}`}
+                        >
+                          <RefreshCw className="w-4 h-4 text-black" />
+                        </button>
+                      )}
+                      <button
+                        onClick={(e) => { e.stopPropagation(); setDeleteDialog({ open: true, imageId: image.image_id }); }}
+                        className="w-10 h-10 rounded-full bg-red-900/50 hover:bg-red-900 flex items-center justify-center transition-all"
+                        title="Delete"
+                        data-testid={`delete-${image.image_id}`}
+                      >
+                        <Trash2 className="w-4 h-4 text-red-300" />
+                      </button>
+                    </div>
+                  </div>
+
+                  <div className="p-4 border-t border-zinc-800">
+                    <p className="text-sm text-white truncate font-medium">{image.original_filename}</p>
+                    <p className="text-xs text-zinc-600 mt-1">
+                      {new Date(image.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </p>
+                  </div>
+                </motion.div>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
       </div>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Delete Dialog */}
       <Dialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open, imageId: null })}>
-        <DialogContent className="bg-[#0a0a0f] border-white/10">
+        <DialogContent className="bg-zinc-900 border-zinc-800">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <Trash2 className="w-5 h-5 text-red-400" />
-              Delete Image
-            </DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Are you sure you want to delete this image? This action cannot be undone and will remove the image from cloud storage.
+            <DialogTitle className="text-white">Delete Image</DialogTitle>
+            <DialogDescription className="text-zinc-500">
+              Are you sure? This action cannot be undone.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialog({ open: false, imageId: null })}
-              className="border-white/10 hover:bg-white/5 text-white"
-              data-testid="cancel-delete-btn"
-            >
+            <Button variant="outline" onClick={() => setDeleteDialog({ open: false, imageId: null })} className="border-zinc-700 hover:bg-zinc-800 text-white" data-testid="cancel-delete-btn">
               Cancel
             </Button>
-            <Button
-              onClick={handleDelete}
-              className="bg-red-500 hover:bg-red-600 text-white"
-              data-testid="confirm-delete-btn"
-            >
+            <Button onClick={handleDelete} className="bg-red-600 hover:bg-red-700 text-white" data-testid="confirm-delete-btn">
               Delete
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
-      {/* Image Preview Dialog */}
+      {/* Preview Dialog */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
-        <DialogContent className="bg-[#0a0a0f] border-white/10 max-w-4xl">
+        <DialogContent className="bg-zinc-900 border-zinc-800 max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="text-white flex items-center gap-2">
-              <ImageIcon className="w-5 h-5 text-[#7c3aed]" />
-              {selectedImage?.original_filename}
-            </DialogTitle>
+            <DialogTitle className="text-white">{selectedImage?.original_filename}</DialogTitle>
           </DialogHeader>
           {selectedImage && (
-            <div className="space-y-6">
-              {/* Side by side comparison if processed */}
+            <div className="space-y-4">
               {selectedImage.processed_url && selectedImage.original_url ? (
-                <BeforeAfterSlider
-                  beforeImage={selectedImage.original_url}
-                  afterImage={selectedImage.processed_url}
-                  beforeLabel="Original"
-                  afterLabel="Processed"
-                  className="max-h-[500px]"
-                />
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-xs text-zinc-600 mb-2">Original</p>
+                    <div className="aspect-square bg-zinc-800 rounded-lg overflow-hidden">
+                      <img src={selectedImage.original_url} alt="Original" className="w-full h-full object-contain" />
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-xs text-zinc-600 mb-2">Processed</p>
+                    <div className="aspect-square bg-checkered rounded-lg overflow-hidden">
+                      <img src={selectedImage.processed_url} alt="Processed" className="w-full h-full object-contain" />
+                    </div>
+                  </div>
+                </div>
               ) : (
                 <div className="aspect-video bg-checkered rounded-lg overflow-hidden">
-                  <img
-                    src={selectedImage.processed_url || selectedImage.original_url}
-                    alt={selectedImage.original_filename}
-                    className="w-full h-full object-contain"
-                  />
+                  <img src={selectedImage.processed_url || selectedImage.original_url} alt={selectedImage.original_filename} className="w-full h-full object-contain" />
                 </div>
               )}
               
-              {/* Actions */}
               {selectedImage.processed_url && (
                 <div className="flex gap-3">
-                  <Button
-                    onClick={() => handleCopyLink(selectedImage.processed_url)}
-                    variant="outline"
-                    className="border-white/10 hover:bg-white/5 text-white flex-1"
-                    data-testid="dialog-copy-link-btn"
-                  >
+                  <Button onClick={() => handleCopyLink(selectedImage.processed_url)} variant="outline" className="flex-1 border-zinc-700 hover:bg-zinc-800 text-white" data-testid="dialog-copy-link-btn">
                     <Link2 className="w-4 h-4 mr-2" />
                     Copy Link
                   </Button>
-                  <GlowButton
-                    onClick={() => handleDownload(selectedImage.processed_url, `flipcut-${selectedImage.image_id}.png`)}
-                    className="flex-1"
-                    data-testid="dialog-download-btn"
-                  >
+                  <Button onClick={() => handleDownload(selectedImage.processed_url, `flipcut-${selectedImage.image_id}.png`)} className="flex-1 bg-white hover:bg-zinc-200 text-black" data-testid="dialog-download-btn">
                     <Download className="w-4 h-4 mr-2" />
                     Download
-                  </GlowButton>
+                  </Button>
                 </div>
               )}
             </div>

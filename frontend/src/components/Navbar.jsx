@@ -11,7 +11,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useAuth } from "@/App";
-import { Scissors, LogOut, User, LayoutDashboard } from "lucide-react";
+import { LogOut, LayoutDashboard, User } from "lucide-react";
 
 export const Navbar = () => {
   const { user, loading, login, logout } = useAuth();
@@ -22,33 +22,34 @@ export const Navbar = () => {
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-      className="navbar fixed top-0 left-0 right-0 z-50 px-6 py-4"
+      className="fixed top-0 left-0 right-0 z-50 px-6 py-4 bg-black/80 backdrop-blur-md border-b border-zinc-900"
       data-testid="navbar"
     >
-      <div className="max-w-7xl mx-auto flex items-center justify-between">
+      <div className="max-w-6xl mx-auto flex items-center justify-between">
         {/* Logo */}
         <Link 
           to="/" 
-          className="flex items-center gap-2 group"
+          className="flex items-center gap-3 group"
           data-testid="logo-link"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#7c3aed] to-[#06b6d4] flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-            <Scissors className="w-5 h-5 text-white" />
+          <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center group-hover:scale-105 transition-transform">
+            <svg viewBox="0 0 24 24" fill="none" className="w-5 h-5">
+              <path d="M4 4L10 12L4 20H8L14 12L8 4H4Z" fill="black"/>
+              <path d="M12 4L18 12L12 20H16L22 12L16 4H12Z" fill="black" fillOpacity="0.5"/>
+            </svg>
           </div>
-          <span className="text-xl font-bold text-white font-outfit">
-            Flip<span className="gradient-text">Cut</span>
-          </span>
+          <span className="text-lg font-semibold text-white tracking-tight">FlipCut</span>
         </Link>
 
         {/* Navigation */}
         <div className="flex items-center gap-4">
           {loading ? (
-            <div className="w-32 h-9 rounded-full skeleton" />
+            <div className="w-24 h-9 rounded-full bg-zinc-900 animate-pulse" />
           ) : user ? (
             <div className="flex items-center gap-4">
               <Button
                 variant="ghost"
-                className="text-zinc-400 hover:text-white hover:bg-white/5"
+                className="text-zinc-400 hover:text-white hover:bg-zinc-900"
                 onClick={() => navigate('/dashboard')}
                 data-testid="dashboard-nav-btn"
               >
@@ -59,12 +60,12 @@ export const Navbar = () => {
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button 
-                    className="flex items-center gap-2 p-1 rounded-full hover:bg-white/5 transition-colors"
+                    className="flex items-center gap-2 p-1 rounded-full hover:bg-zinc-900 transition-colors"
                     data-testid="user-menu-trigger"
                   >
-                    <Avatar className="w-8 h-8 border border-white/10">
+                    <Avatar className="w-8 h-8 border border-zinc-800">
                       <AvatarImage src={user.picture} alt={user.name} />
-                      <AvatarFallback className="bg-[#7c3aed] text-white text-sm">
+                      <AvatarFallback className="bg-white text-black text-sm font-medium">
                         {user.name?.charAt(0) || user.email?.charAt(0) || 'U'}
                       </AvatarFallback>
                     </Avatar>
@@ -72,22 +73,22 @@ export const Navbar = () => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent 
                   align="end" 
-                  className="w-56 bg-[#0a0a0f] border-white/10"
+                  className="w-56 bg-zinc-900 border-zinc-800"
                 >
                   <div className="px-3 py-2">
                     <p className="text-sm font-medium text-white">{user.name}</p>
                     <p className="text-xs text-zinc-500">{user.email}</p>
                   </div>
-                  <DropdownMenuSeparator className="bg-white/10" />
+                  <DropdownMenuSeparator className="bg-zinc-800" />
                   <DropdownMenuItem 
-                    className="text-zinc-400 hover:text-white hover:bg-white/5 cursor-pointer"
+                    className="text-zinc-400 hover:text-white hover:bg-zinc-800 cursor-pointer"
                     onClick={() => navigate('/dashboard')}
                     data-testid="dashboard-menu-item"
                   >
                     <LayoutDashboard className="w-4 h-4 mr-2" />
                     Dashboard
                   </DropdownMenuItem>
-                  <DropdownMenuSeparator className="bg-white/10" />
+                  <DropdownMenuSeparator className="bg-zinc-800" />
                   <DropdownMenuItem 
                     className="text-red-400 hover:text-red-300 hover:bg-red-500/10 cursor-pointer"
                     onClick={logout}
@@ -105,7 +106,7 @@ export const Navbar = () => {
               className="rounded-full bg-white text-black hover:bg-zinc-200 px-6 font-medium"
               data-testid="login-btn"
             >
-              Sign in with Google
+              Sign in
             </Button>
           )}
         </div>
