@@ -4,7 +4,7 @@ import { cn } from '@/lib/utils';
 export function SpotlightCard({
   children,
   className,
-  spotlightColor = 'rgba(124, 58, 237, 0.15)',
+  spotlightColor = 'rgba(255, 255, 255, 0.05)',
 }) {
   const divRef = useRef(null);
   const [isFocused, setIsFocused] = useState(false);
