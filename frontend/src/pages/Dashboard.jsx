@@ -28,13 +28,22 @@ import {
   Scissors,
   FlipHorizontal2,
   Cloud,
+  Sparkles,
+  ImagePlus,
+  FolderOpen,
 } from "lucide-react";
 
+// Effects
+import { SpotlightCard } from "@/components/effects/SpotlightCard";
+import { GridPattern, DotPattern } from "@/components/effects/GridPattern";
+import { BeforeAfterSlider } from "@/components/effects/BeforeAfterSlider";
+import { GlowButton } from "@/components/effects/AnimatedButtons";
+
 const PROCESSING_STEPS = [
-  { key: "upload", label: "Uploading", icon: Upload },
-  { key: "removing", label: "Removing Background", icon: Scissors },
-  { key: "flipping", label: "Flipping", icon: FlipHorizontal2 },
-  { key: "saving", label: "Saving to Cloud", icon: Cloud },
+  { key: "upload", label: "Uploading", icon: Upload, color: "text-blue-400" },
+  { key: "removing", label: "Removing Background", icon: Scissors, color: "text-violet-400" },
+  { key: "flipping", label: "Flipping", icon: FlipHorizontal2, color: "text-cyan-400" },
+  { key: "saving", label: "Saving to Cloud", icon: Cloud, color: "text-emerald-400" },
 ];
 
 export default function Dashboard() {
@@ -43,19 +52,17 @@ export default function Dashboard() {
   const [images, setImages] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
-  const [processing, setProcessing] = useState(null); // Current processing image id
+  const [processing, setProcessing] = useState(null);
   const [processingStep, setProcessingStep] = useState(0);
   const [deleteDialog, setDeleteDialog] = useState({ open: false, imageId: null });
   const [selectedImage, setSelectedImage] = useState(null);
 
-  // Redirect if not authenticated
   useEffect(() => {
     if (!authLoading && !user) {
       navigate("/");
     }
   }, [user, authLoading, navigate]);
 
-  // Fetch images
   const fetchImages = useCallback(async () => {
     if (!user) return;
     try {
@@ -77,19 +84,16 @@ export default function Dashboard() {
     }
   }, [user, fetchImages]);
 
-  // Handle file upload
   const onDrop = useCallback(async (acceptedFiles) => {
     const file = acceptedFiles[0];
     if (!file) return;
 
-    // Validate file type
     const allowedTypes = ["image/png", "image/jpeg", "image/webp"];
     if (!allowedTypes.includes(file.type)) {
       toast.error("Invalid file type. Please upload PNG, JPEG, or WebP images.");
       return;
     }
 
-    // Validate file size (8MB)
     if (file.size > 8 * 1024 * 1024) {
       toast.error("File too large. Maximum size is 8MB.");
       return;
@@ -99,7 +103,6 @@ export default function Dashboard() {
     setProcessingStep(0);
 
     try {
-      // Step 1: Upload
       const formData = new FormData();
       formData.append("file", file);
 
@@ -110,18 +113,21 @@ export default function Dashboard() {
       const imageId = uploadResponse.data.image_id;
       toast.success("Image uploaded! Starting processing...");
 
-      // Step 2-4: Process (background removal + flip + cloud save)
       setProcessing(imageId);
+      
+      // Simulate step progression for better UX
       setProcessingStep(1);
-
-      // Start processing
+      await new Promise(r => setTimeout(r, 500));
+      setProcessingStep(2);
+      
       const processResponse = await apiClient.post(`/images/${imageId}/process`);
+      
+      setProcessingStep(3);
+      await new Promise(r => setTimeout(r, 300));
 
       if (processResponse.data.status === "PROCESSED") {
         setProcessingStep(4);
         toast.success("Image processed successfully!");
-        
-        // Refresh images list
         await fetchImages();
       } else {
         toast.error("Processing failed. Please try again.");
@@ -148,7 +154,6 @@ export default function Dashboard() {
     disabled: uploading || processing,
   });
 
-  // Handle copy link
   const handleCopyLink = async (url) => {
     try {
       await navigator.clipboard.writeText(url);
@@ -158,7 +163,6 @@ export default function Dashboard() {
     }
   };
 
-  // Handle download
   const handleDownload = async (url, filename) => {
     try {
       const response = await fetch(url);
@@ -177,7 +181,6 @@ export default function Dashboard() {
     }
   };
 
-  // Handle delete
   const handleDelete = async () => {
     if (!deleteDialog.imageId) return;
 
@@ -191,7 +194,6 @@ export default function Dashboard() {
     }
   };
 
-  // Handle retry processing
   const handleRetry = async (imageId) => {
     setProcessing(imageId);
     setProcessingStep(1);
@@ -219,18 +221,25 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="min-h-screen pt-24 pb-12 px-6" data-testid="dashboard">
-      <div className="max-w-6xl mx-auto">
+    <div className="min-h-screen pt-24 pb-12 px-6 relative" data-testid="dashboard">
+      {/* Background */}
+      <div className="fixed inset-0 pointer-events-none">
+        <DotPattern className="opacity-30" />
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-[#7c3aed]/10 rounded-full blur-[150px]" />
+        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-[#06b6d4]/10 rounded-full blur-[150px]" />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           className="mb-10"
         >
-          <h1 className="text-3xl sm:text-4xl font-bold text-white mb-2">
+          <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-3">
             Your Images
           </h1>
-          <p className="text-zinc-400">
+          <p className="text-zinc-400 text-lg">
             Upload, process, and manage your images
           </p>
         </motion.div>
@@ -244,45 +253,89 @@ export default function Dashboard() {
         >
           <div
             {...getRootProps()}
-            className={`upload-zone p-12 text-center cursor-pointer ${
-              isDragActive ? "drag-over" : ""
-            } ${uploading || processing ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`relative overflow-hidden rounded-2xl border-2 border-dashed transition-all duration-300 cursor-pointer
+              ${isDragActive 
+                ? 'border-[#7c3aed] bg-[#7c3aed]/10 scale-[1.02]' 
+                : 'border-white/10 hover:border-[#7c3aed]/50 hover:bg-white/[0.02]'
+              }
+              ${uploading || processing ? 'opacity-80 cursor-not-allowed' : ''}
+            `}
             data-testid="upload-zone"
           >
-            <input {...getInputProps()} data-testid="file-input" />
-            
-            {uploading || processing ? (
-              <div className="space-y-4">
-                <Loader2 className="w-12 h-12 text-[#7c3aed] animate-spin mx-auto" />
-                <div className="space-y-2">
-                  <p className="text-white font-medium">
-                    {PROCESSING_STEPS[processingStep]?.label || "Processing..."}
-                  </p>
-                  <div className="flex justify-center gap-2">
-                    {PROCESSING_STEPS.map((step, index) => (
-                      <div
-                        key={step.key}
-                        className={`w-2 h-2 rounded-full transition-colors ${
-                          index <= processingStep
-                            ? "bg-[#7c3aed]"
-                            : "bg-white/20"
-                        }`}
-                      />
-                    ))}
+            {/* Background Pattern */}
+            <div className="absolute inset-0 opacity-50">
+              <GridPattern width={30} height={30} />
+            </div>
+
+            <div className="relative p-12 lg:p-16 text-center">
+              <input {...getInputProps()} data-testid="file-input" />
+              
+              {uploading || processing ? (
+                <div className="space-y-6">
+                  {/* Processing Animation */}
+                  <div className="relative w-20 h-20 mx-auto">
+                    <div className="absolute inset-0 rounded-full bg-[#7c3aed]/20 animate-ping" />
+                    <div className="relative w-20 h-20 rounded-full bg-[#7c3aed]/10 flex items-center justify-center">
+                      <Sparkles className="w-10 h-10 text-[#7c3aed] animate-pulse" />
+                    </div>
+                  </div>
+
+                  {/* Processing Steps */}
+                  <div className="space-y-4">
+                    <p className="text-white font-semibold text-lg">
+                      {PROCESSING_STEPS[processingStep]?.label || "Processing..."}
+                    </p>
+                    
+                    {/* Step Progress */}
+                    <div className="flex items-center justify-center gap-3">
+                      {PROCESSING_STEPS.map((step, index) => {
+                        const StepIcon = step.icon;
+                        const isActive = index === processingStep;
+                        const isComplete = index < processingStep;
+                        
+                        return (
+                          <div key={step.key} className="flex items-center">
+                            <div className={`
+                              w-10 h-10 rounded-full flex items-center justify-center transition-all duration-300
+                              ${isActive ? 'bg-[#7c3aed] scale-110' : ''}
+                              ${isComplete ? 'bg-emerald-500' : ''}
+                              ${!isActive && !isComplete ? 'bg-white/10' : ''}
+                            `}>
+                              {isComplete ? (
+                                <CheckCircle className="w-5 h-5 text-white" />
+                              ) : (
+                                <StepIcon className={`w-5 h-5 ${isActive ? 'text-white' : 'text-zinc-500'}`} />
+                              )}
+                            </div>
+                            {index < PROCESSING_STEPS.length - 1 && (
+                              <div className={`w-8 h-0.5 mx-1 ${isComplete ? 'bg-emerald-500' : 'bg-white/10'}`} />
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ) : (
-              <>
-                <Upload className="w-12 h-12 text-[#7c3aed] mx-auto mb-4" />
-                <p className="text-white font-medium mb-2">
-                  {isDragActive ? "Drop your image here" : "Drag & drop or click to upload"}
-                </p>
-                <p className="text-sm text-zinc-500">
-                  Supports PNG, JPEG, WebP up to 8MB
-                </p>
-              </>
-            )}
+              ) : (
+                <>
+                  <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#7c3aed] to-[#06b6d4] flex items-center justify-center mx-auto mb-6 shadow-lg shadow-[#7c3aed]/20">
+                    <Upload className="w-10 h-10 text-white" />
+                  </div>
+                  <p className="text-white font-semibold text-xl mb-2">
+                    {isDragActive ? "Drop your image here" : "Drag & drop to upload"}
+                  </p>
+                  <p className="text-zinc-500 mb-4">
+                    or click to select from your computer
+                  </p>
+                  <div className="flex items-center justify-center gap-4 text-xs text-zinc-600">
+                    <span className="px-2 py-1 rounded bg-white/5">PNG</span>
+                    <span className="px-2 py-1 rounded bg-white/5">JPEG</span>
+                    <span className="px-2 py-1 rounded bg-white/5">WebP</span>
+                    <span className="px-2 py-1 rounded bg-white/5">Max 8MB</span>
+                  </div>
+                </>
+              )}
+            </div>
           </div>
         </motion.div>
 
@@ -292,22 +345,41 @@ export default function Dashboard() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.2 }}
         >
-          <h2 className="text-xl font-semibold text-white mb-6">Gallery</h2>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-2xl font-semibold text-white flex items-center gap-3">
+              <FolderOpen className="w-6 h-6 text-[#7c3aed]" />
+              Gallery
+            </h2>
+            {images.length > 0 && (
+              <span className="text-sm text-zinc-500">{images.length} images</span>
+            )}
+          </div>
           
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="aspect-square rounded-2xl skeleton" />
+                <div key={i} className="aspect-square rounded-2xl bg-white/5 animate-pulse" />
               ))}
             </div>
           ) : images.length === 0 ? (
-            <div className="empty-state glass rounded-2xl">
-              <ImageIcon className="w-16 h-16 text-zinc-600 mb-4" />
-              <h3 className="text-lg font-medium text-white mb-2">No images yet</h3>
-              <p className="text-zinc-500 text-sm">
-                Upload your first image to get started
-              </p>
-            </div>
+            <SpotlightCard className="py-16">
+              <div className="text-center">
+                <div className="w-20 h-20 rounded-2xl bg-white/5 flex items-center justify-center mx-auto mb-6">
+                  <ImageIcon className="w-10 h-10 text-zinc-600" />
+                </div>
+                <h3 className="text-xl font-medium text-white mb-2">No images yet</h3>
+                <p className="text-zinc-500 mb-6">
+                  Upload your first image to get started
+                </p>
+                <GlowButton
+                  onClick={() => document.querySelector('[data-testid="upload-zone"]')?.click()}
+                  className="px-6 py-3"
+                >
+                  <ImagePlus className="w-5 h-5 mr-2" />
+                  Upload Image
+                </GlowButton>
+              </div>
+            </SpotlightCard>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               <AnimatePresence>
@@ -318,110 +390,116 @@ export default function Dashboard() {
                     animate={{ opacity: 1, scale: 1 }}
                     exit={{ opacity: 0, scale: 0.9 }}
                     transition={{ delay: index * 0.05 }}
-                    className="image-card glass rounded-2xl overflow-hidden group"
+                    className="group relative rounded-2xl overflow-hidden bg-white/5 border border-white/10 hover:border-[#7c3aed]/50 transition-all duration-300 hover:shadow-xl hover:shadow-[#7c3aed]/10"
                     data-testid={`image-card-${image.image_id}`}
                   >
                     {/* Image Preview */}
                     <div 
-                      className="aspect-square relative bg-checkered cursor-pointer"
+                      className="aspect-square relative bg-checkered cursor-pointer overflow-hidden"
                       onClick={() => setSelectedImage(image)}
                     >
                       <img
                         src={image.processed_url || image.original_url}
                         alt={image.original_filename}
-                        className="w-full h-full object-contain"
+                        className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                       />
                       
                       {/* Status Badge */}
                       <div className="absolute top-3 right-3">
                         {image.status === "PROCESSED" && (
-                          <div className="bg-green-500/20 text-green-400 px-2 py-1 rounded-full text-xs flex items-center gap-1">
-                            <CheckCircle className="w-3 h-3" />
+                          <div className="bg-emerald-500/20 backdrop-blur-sm text-emerald-400 px-3 py-1 rounded-full text-xs flex items-center gap-1.5 border border-emerald-500/30">
+                            <CheckCircle className="w-3.5 h-3.5" />
                             Processed
                           </div>
                         )}
                         {image.status === "PROCESSING" && (
-                          <div className="bg-[#7c3aed]/20 text-[#7c3aed] px-2 py-1 rounded-full text-xs flex items-center gap-1">
-                            <Loader2 className="w-3 h-3 animate-spin" />
+                          <div className="bg-[#7c3aed]/20 backdrop-blur-sm text-[#7c3aed] px-3 py-1 rounded-full text-xs flex items-center gap-1.5 border border-[#7c3aed]/30">
+                            <Loader2 className="w-3.5 h-3.5 animate-spin" />
                             Processing
                           </div>
                         )}
                         {image.status === "FAILED" && (
-                          <div className="bg-red-500/20 text-red-400 px-2 py-1 rounded-full text-xs flex items-center gap-1">
-                            <XCircle className="w-3 h-3" />
+                          <div className="bg-red-500/20 backdrop-blur-sm text-red-400 px-3 py-1 rounded-full text-xs flex items-center gap-1.5 border border-red-500/30">
+                            <XCircle className="w-3.5 h-3.5" />
                             Failed
                           </div>
                         )}
                         {image.status === "UPLOADED" && (
-                          <div className="bg-yellow-500/20 text-yellow-400 px-2 py-1 rounded-full text-xs flex items-center gap-1">
-                            <AlertCircle className="w-3 h-3" />
-                            Not Processed
+                          <div className="bg-amber-500/20 backdrop-blur-sm text-amber-400 px-3 py-1 rounded-full text-xs flex items-center gap-1.5 border border-amber-500/30">
+                            <AlertCircle className="w-3.5 h-3.5" />
+                            Pending
                           </div>
                         )}
                       </div>
 
-                      {/* Hover Actions */}
-                      <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
-                        {image.processed_url && (
-                          <>
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-end justify-center p-4">
+                        <div className="flex items-center gap-2">
+                          {image.processed_url && (
+                            <>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleCopyLink(image.processed_url);
+                                }}
+                                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110"
+                                title="Copy link"
+                                data-testid={`copy-link-${image.image_id}`}
+                              >
+                                <Link2 className="w-4 h-4 text-white" />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleDownload(image.processed_url, `flipcut-${image.image_id}.png`);
+                                }}
+                                className="w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110"
+                                title="Download"
+                                data-testid={`download-${image.image_id}`}
+                              >
+                                <Download className="w-4 h-4 text-white" />
+                              </button>
+                            </>
+                          )}
+                          {(image.status === "FAILED" || image.status === "UPLOADED") && (
                             <button
                               onClick={(e) => {
                                 e.stopPropagation();
-                                handleCopyLink(image.processed_url);
+                                handleRetry(image.image_id);
                               }}
-                              className="action-btn w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
-                              title="Copy link"
-                              data-testid={`copy-link-${image.image_id}`}
+                              className="w-10 h-10 rounded-full bg-[#7c3aed]/50 hover:bg-[#7c3aed] backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110"
+                              title="Retry processing"
+                              data-testid={`retry-${image.image_id}`}
                             >
-                              <Link2 className="w-4 h-4 text-white" />
+                              <RefreshCw className="w-4 h-4 text-white" />
                             </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleDownload(image.processed_url, `flipcut-${image.image_id}.png`);
-                              }}
-                              className="action-btn w-10 h-10 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center"
-                              title="Download"
-                              data-testid={`download-${image.image_id}`}
-                            >
-                              <Download className="w-4 h-4 text-white" />
-                            </button>
-                          </>
-                        )}
-                        {(image.status === "FAILED" || image.status === "UPLOADED") && (
+                          )}
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleRetry(image.image_id);
+                              setDeleteDialog({ open: true, imageId: image.image_id });
                             }}
-                            className="action-btn w-10 h-10 rounded-full bg-[#7c3aed]/50 hover:bg-[#7c3aed] flex items-center justify-center"
-                            title="Retry processing"
-                            data-testid={`retry-${image.image_id}`}
+                            className="w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/40 backdrop-blur-sm flex items-center justify-center transition-all duration-200 hover:scale-110"
+                            title="Delete"
+                            data-testid={`delete-${image.image_id}`}
                           >
-                            <RefreshCw className="w-4 h-4 text-white" />
+                            <Trash2 className="w-4 h-4 text-red-400" />
                           </button>
-                        )}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeleteDialog({ open: true, imageId: image.image_id });
-                          }}
-                          className="action-btn w-10 h-10 rounded-full bg-red-500/20 hover:bg-red-500/40 flex items-center justify-center"
-                          title="Delete"
-                          data-testid={`delete-${image.image_id}`}
-                        >
-                          <Trash2 className="w-4 h-4 text-red-400" />
-                        </button>
+                        </div>
                       </div>
                     </div>
 
                     {/* Image Info */}
-                    <div className="p-4">
-                      <p className="text-sm text-white truncate mb-1">
+                    <div className="p-4 border-t border-white/5">
+                      <p className="text-sm text-white truncate font-medium mb-1">
                         {image.original_filename}
                       </p>
                       <p className="text-xs text-zinc-500">
-                        {new Date(image.created_at).toLocaleDateString()}
+                        {new Date(image.created_at).toLocaleDateString('en-US', {
+                          month: 'short',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
                       </p>
                     </div>
                   </motion.div>
@@ -436,9 +514,12 @@ export default function Dashboard() {
       <Dialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open, imageId: null })}>
         <DialogContent className="bg-[#0a0a0f] border-white/10">
           <DialogHeader>
-            <DialogTitle className="text-white">Delete Image</DialogTitle>
+            <DialogTitle className="text-white flex items-center gap-2">
+              <Trash2 className="w-5 h-5 text-red-400" />
+              Delete Image
+            </DialogTitle>
             <DialogDescription className="text-zinc-400">
-              Are you sure you want to delete this image? This action cannot be undone.
+              Are you sure you want to delete this image? This action cannot be undone and will remove the image from cloud storage.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter className="flex gap-3">
@@ -465,36 +546,22 @@ export default function Dashboard() {
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="bg-[#0a0a0f] border-white/10 max-w-4xl">
           <DialogHeader>
-            <DialogTitle className="text-white">
+            <DialogTitle className="text-white flex items-center gap-2">
+              <ImageIcon className="w-5 h-5 text-[#7c3aed]" />
               {selectedImage?.original_filename}
             </DialogTitle>
           </DialogHeader>
           {selectedImage && (
-            <div className="space-y-4">
+            <div className="space-y-6">
               {/* Side by side comparison if processed */}
               {selectedImage.processed_url && selectedImage.original_url ? (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-zinc-500 mb-2">Original</p>
-                    <div className="aspect-square bg-zinc-900 rounded-lg overflow-hidden">
-                      <img
-                        src={selectedImage.original_url}
-                        alt="Original"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-xs text-zinc-500 mb-2">Processed</p>
-                    <div className="aspect-square bg-checkered rounded-lg overflow-hidden">
-                      <img
-                        src={selectedImage.processed_url}
-                        alt="Processed"
-                        className="w-full h-full object-contain"
-                      />
-                    </div>
-                  </div>
-                </div>
+                <BeforeAfterSlider
+                  beforeImage={selectedImage.original_url}
+                  afterImage={selectedImage.processed_url}
+                  beforeLabel="Original"
+                  afterLabel="Processed"
+                  className="max-h-[500px]"
+                />
               ) : (
                 <div className="aspect-video bg-checkered rounded-lg overflow-hidden">
                   <img
@@ -511,20 +578,20 @@ export default function Dashboard() {
                   <Button
                     onClick={() => handleCopyLink(selectedImage.processed_url)}
                     variant="outline"
-                    className="border-white/10 hover:bg-white/5 text-white"
+                    className="border-white/10 hover:bg-white/5 text-white flex-1"
                     data-testid="dialog-copy-link-btn"
                   >
                     <Link2 className="w-4 h-4 mr-2" />
                     Copy Link
                   </Button>
-                  <Button
+                  <GlowButton
                     onClick={() => handleDownload(selectedImage.processed_url, `flipcut-${selectedImage.image_id}.png`)}
-                    className="bg-[#7c3aed] hover:bg-[#6d28d9] text-white"
+                    className="flex-1"
                     data-testid="dialog-download-btn"
                   >
                     <Download className="w-4 h-4 mr-2" />
                     Download
-                  </Button>
+                  </GlowButton>
                 </div>
               )}
             </div>
