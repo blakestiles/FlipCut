@@ -157,7 +157,7 @@ router.post(
 router.post('/:image_id/process', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     const user = req.user!;
-    const imageId = req.params.image_id;
+    const imageId = String(req.params.image_id);
 
     const db = getDatabase();
     const imageDoc = await db.collection('images').findOne(
@@ -411,7 +411,7 @@ router.get('/', requireAuth, async (req: AuthRequest, res: Response) => {
 router.get('/:image_id', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     const user = req.user!;
-    const imageId = req.params.image_id;
+    const imageId = String(req.params.image_id);
 
     const db = getDatabase();
     const imageDoc = await db.collection('images').findOne(
@@ -434,7 +434,7 @@ router.get('/:image_id', requireAuth, async (req: AuthRequest, res: Response) =>
 router.delete('/:image_id', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     const user = req.user!;
-    const imageId = req.params.image_id;
+    const imageId = String(req.params.image_id);
 
     const db = getDatabase();
     const imageDoc = await db.collection('images').findOne(
