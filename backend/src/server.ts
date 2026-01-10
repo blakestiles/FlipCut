@@ -71,45 +71,53 @@ app.use((err: any, _req: Request, res: Response, _next: any) => {
   });
 });
 
-async function startServer() {
-  try {
-    console.log('🚀 Starting FlipCut API server...');
-    console.log(`   Port: ${PORT}`);
-    console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
-    
-    app.listen(PORT, '0.0.0.0', async () => {
-      console.log(`✅ FlipCut API server running on port ${PORT}`);
-      console.log(`   Health check: http://localhost:${PORT}/api/health`);
-      console.log(`   API root: http://localhost:${PORT}/api`);
+if (require.main === module) {
+  async function startServer() {
+    try {
+      console.log('🚀 Starting FlipCut API server...');
+      console.log(`   Port: ${PORT}`);
+      console.log(`   Environment: ${process.env.NODE_ENV || 'development'}`);
       
-      try {
-        await connectDatabase();
-      } catch (error: any) {
-        console.error('⚠️  MongoDB connection failed:', error.message);
-        console.error('   Some features may not work until MongoDB is available');
-        console.error('   Health endpoint will still respond');
-      }
-    });
-  } catch (error: any) {
-    console.error('❌ Failed to start server:', error.message);
-    console.error('');
-    console.error('Troubleshooting:');
-    console.error('  1. Check if port 8000 is already in use');
-    console.error('  2. Verify your environment variables are set');
-    process.exit(1);
+      app.listen(PORT, '0.0.0.0', async () => {
+        console.log(`✅ FlipCut API server running on port ${PORT}`);
+        console.log(`   Health check: http://localhost:${PORT}/api/health`);
+        console.log(`   API root: http://localhost:${PORT}/api`);
+        
+        try {
+          await connectDatabase();
+        } catch (error: any) {
+          console.error('⚠️  MongoDB connection failed:', error.message);
+          console.error('   Some features may not work until MongoDB is available');
+          console.error('   Health endpoint will still respond');
+        }
+      });
+    } catch (error: any) {
+      console.error('❌ Failed to start server:', error.message);
+      console.error('');
+      console.error('Troubleshooting:');
+      console.error('  1. Check if port 8000 is already in use');
+      console.error('  2. Verify your environment variables are set');
+      process.exit(1);
+    }
   }
+
+  process.on('SIGTERM', async () => {
+    console.log('SIGTERM received, shutting down gracefully...');
+    await closeDatabase();
+    process.exit(0);
+  });
+
+  process.on('SIGINT', async () => {
+    console.log('SIGINT received, shutting down gracefully...');
+    await closeDatabase();
+    process.exit(0);
+  });
+
+  startServer();
 }
 
-process.on('SIGTERM', async () => {
-  console.log('SIGTERM received, shutting down gracefully...');
-  await closeDatabase();
-  process.exit(0);
+connectDatabase().catch((error: any) => {
+  console.error('⚠️  MongoDB connection failed:', error.message);
 });
 
-process.on('SIGINT', async () => {
-  console.log('SIGINT received, shutting down gracefully...');
-  await closeDatabase();
-  process.exit(0);
-});
-
-startServer();
+export default app;
