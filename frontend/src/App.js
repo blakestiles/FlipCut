@@ -11,7 +11,11 @@ import Dashboard from "@/pages/Dashboard";
 import AuthCallback from "@/components/AuthCallback";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL?.replace(/\/$/, '') || '';
-export const API = `${BACKEND_URL}/api`;
+export const API = BACKEND_URL ? `${BACKEND_URL}/api` : '';
+
+if (!BACKEND_URL) {
+  console.error('⚠️ REACT_APP_BACKEND_URL is not set! API calls will fail.');
+}
 
 export const apiClient = axios.create({
   baseURL: API,
