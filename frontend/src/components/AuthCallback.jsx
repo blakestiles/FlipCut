@@ -43,18 +43,7 @@ export const AuthCallback = () => {
         }
       } catch (error) {
         console.error("Auth callback error:", error);
-        
-        let errorMessage = "Authentication failed. Please try again.";
-        
-        if (error.response) {
-          errorMessage = error.response.data?.detail || error.response.statusText || errorMessage;
-        } else if (error.request) {
-          errorMessage = "Network error: Could not reach the server. Please check your connection and backend URL configuration.";
-          console.error("Network error - no response received. Backend URL:", process.env.REACT_APP_BACKEND_URL);
-        } else {
-          errorMessage = error.message || errorMessage;
-        }
-        
+        const errorMessage = error.response?.data?.detail || error.message || "Authentication failed. Please try again.";
         toast.error(errorMessage);
         navigate("/");
       }

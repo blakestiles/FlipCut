@@ -19,35 +19,17 @@ const allowedOrigins = process.env.CORS_ORIGINS?.split(',')
   .filter(origin => origin.length > 0) || 
   (isProduction ? [] : ['http://localhost:3000', 'http://127.0.0.1:3000']);
 
-const isVercelUrl = (origin: string): boolean => {
-  return origin.includes('.vercel.app') || 
-         origin.includes('localhost') || 
-         origin.includes('127.0.0.1') ||
-         origin.includes('.netlify.app') ||
-         origin.includes('.railway.app');
-};
-
 app.use(cors({
   origin: (origin, callback) => {
     if (!origin && !isProduction) {
       return callback(null, true);
     }
-    
-    if (!origin) {
-      return callback(null, true);
+    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
+      callback(null, true);
+    } else {
+      console.log(`CORS blocked origin: ${origin}. Allowed origins:`, allowedOrigins);
+      callback(new Error('Not allowed by CORS'));
     }
-    
-    if (allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-      return callback(null, true);
-    }
-    
-    if (isVercelUrl(origin)) {
-      console.log(`✅ Allowing Vercel/preview URL: ${origin}`);
-      return callback(null, true);
-    }
-    
-    console.log(`❌ CORS blocked origin: ${origin}. Allowed origins:`, allowedOrigins);
-    callback(new Error(`Not allowed by CORS: ${origin}`));
   },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],

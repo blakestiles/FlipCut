@@ -11,16 +11,40 @@ import Dashboard from "@/pages/Dashboard";
 import AuthCallback from "@/components/AuthCallback";
 
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL?.replace(/\/$/, '') || '';
-export const API = BACKEND_URL ? `${BACKEND_URL}/api` : '';
 
 if (!BACKEND_URL) {
-  console.error('⚠️ REACT_APP_BACKEND_URL is not set! API calls will fail.');
+  console.error('REACT_APP_BACKEND_URL is not set! API requests will fail.');
 }
+
+export const API = BACKEND_URL ? `${BACKEND_URL}/api` : '/api';
 
 export const apiClient = axios.create({
   baseURL: API,
   withCredentials: true,
 });
+
+apiClient.interceptors.request.use(
+  (config) => {
+    if (!BACKEND_URL) {
+      console.error('Backend URL not configured. Request will fail:', config.url);
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
+
+apiClient.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error.code === 'ERR_NETWORK' || error.message === 'Network Error') {
+      console.error('Network error. Check if backend is deployed and REACT_APP_BACKEND_URL is set correctly.');
+      console.error('Current BACKEND_URL:', BACKEND_URL);
+    }
+    return Promise.reject(error);
+  }
+);
 
 export const AuthContext = ({ children }) => {
   const [user, setUser] = useState(null);
