@@ -1,11 +1,10 @@
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState } from "react";
 import "@/App.css";
 import { BrowserRouter, Routes, Route, useNavigate, useLocation } from "react-router-dom";
 import axios from "axios";
 import { Toaster, toast } from "sonner";
 import { motion, AnimatePresence } from "framer-motion";
 
-// Components
 import Navbar from "@/components/Navbar";
 import LandingPage from "@/pages/LandingPage";
 import Dashboard from "@/pages/Dashboard";
@@ -14,13 +13,11 @@ import AuthCallback from "@/components/AuthCallback";
 const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
 export const API = `${BACKEND_URL}/api`;
 
-// Create axios instance with credentials
 export const apiClient = axios.create({
   baseURL: API,
   withCredentials: true,
 });
 
-// Auth Context
 export const AuthContext = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -29,7 +26,6 @@ export const AuthContext = ({ children }) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Skip auth check if we're on the callback with session_id
     if (location.hash?.includes('session_id=')) {
       setLoading(false);
       return;
@@ -50,7 +46,6 @@ export const AuthContext = ({ children }) => {
   }, [location.hash]);
 
   const login = () => {
-    // REMINDER: DO NOT HARDCODE THE URL, OR ADD ANY FALLBACKS OR REDIRECT URLS, THIS BREAKS THE AUTH
     const redirectUrl = window.location.origin + '/dashboard';
     window.location.href = `https://auth.emergentagent.com/?redirect=${encodeURIComponent(redirectUrl)}`;
   };
@@ -73,7 +68,6 @@ export const AuthContext = ({ children }) => {
   );
 };
 
-// Simple context provider
 const AuthContextValue = { user: null, setUser: () => {}, loading: true, login: () => {}, logout: () => {}, showThankYou: false, setShowThankYou: () => {} };
 const AuthProviderContext = React.createContext(AuthContextValue);
 
@@ -93,17 +87,14 @@ export const useAuth = () => {
   return context;
 };
 
-// Navbar wrapper
 const NavbarWrapper = () => {
   const { setShowThankYou } = useAuth();
   return <Navbar onOpenThankYou={() => setShowThankYou(true)} />;
 };
 
-// Router wrapper to detect session_id
 const AppRouter = () => {
   const location = useLocation();
   
-  // Check URL fragment for session_id synchronously during render
   if (location.hash?.includes('session_id=')) {
     return <AuthCallback />;
   }
@@ -115,9 +106,6 @@ const AppRouter = () => {
     </Routes>
   );
 };
-
-// Import React at top level
-import React from "react";
 
 function App() {
   return (

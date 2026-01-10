@@ -12,13 +12,13 @@ export const AuthCallback = () => {
   const hasProcessed = useRef(false);
 
   useEffect(() => {
-    // Prevent double processing in StrictMode
+
     if (hasProcessed.current) return;
     hasProcessed.current = true;
 
     const processAuth = async () => {
       try {
-        // Extract session_id from URL fragment
+
         const hash = location.hash;
         const sessionIdMatch = hash.match(/session_id=([^&]+)/);
         
@@ -30,7 +30,6 @@ export const AuthCallback = () => {
 
         const sessionId = sessionIdMatch[1];
 
-        // Exchange session_id for session_token
         const response = await apiClient.post("/auth/session", {
           session_id: sessionId
         });
@@ -44,7 +43,8 @@ export const AuthCallback = () => {
         }
       } catch (error) {
         console.error("Auth callback error:", error);
-        toast.error("Authentication failed. Please try again.");
+        const errorMessage = error.response?.data?.detail || error.message || "Authentication failed. Please try again.";
+        toast.error(errorMessage);
         navigate("/");
       }
     };

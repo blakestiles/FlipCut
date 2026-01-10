@@ -28,14 +28,14 @@ export const Navbar = ({ onOpenThankYou }) => {
       data-testid="navbar"
     >
       <div className="max-w-6xl mx-auto flex items-center justify-between">
-        {/* Left - Thank You Button (only on landing) */}
+        
         {isLanding && onOpenThankYou ? (
           <button
             onClick={onOpenThankYou}
             className="group relative overflow-hidden rounded-full px-5 py-2.5 bg-zinc-900 border border-zinc-700 hover:border-zinc-500 transition-all duration-300"
             data-testid="thank-uplane-btn"
           >
-            {/* Spotlight effect */}
+            
             <span className="absolute inset-0 overflow-hidden rounded-full">
               <span className="absolute inset-0 rounded-full bg-[image:radial-gradient(75%_100%_at_50%_0%,rgba(56,189,248,0.2)_0%,rgba(56,189,248,0)_75%)] opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
             </span>
@@ -58,7 +58,6 @@ export const Navbar = ({ onOpenThankYou }) => {
           </Link>
         )}
 
-        {/* Center - Logo (only on landing) */}
         {isLanding && (
           <Link 
             to="/" 
@@ -75,7 +74,6 @@ export const Navbar = ({ onOpenThankYou }) => {
           </Link>
         )}
 
-        {/* Right - Nav + CTA */}
         <div className="flex items-center gap-4">
           {loading ? (
             <div className="w-24 h-9 rounded-full bg-zinc-900 animate-pulse" />

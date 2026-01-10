@@ -2,7 +2,6 @@ import React, { useRef, useEffect, useState } from 'react';
 import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-// Scroll Reveal - Elements pop up as you scroll
 export function ScrollReveal({ children, className, delay = 0 }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-100px" });
@@ -24,7 +23,6 @@ export function ScrollReveal({ children, className, delay = 0 }) {
   );
 }
 
-// Text Reveal - Characters reveal on scroll
 export function TextReveal({ text, className }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -63,7 +61,6 @@ function Word({ children, progress, range }) {
   );
 }
 
-// Stagger Reveal - Multiple items reveal with stagger
 export function StaggerReveal({ children, className, staggerDelay = 0.1 }) {
   const ref = useRef(null);
   const isInView = useInView(ref, { once: true, margin: "-50px" });

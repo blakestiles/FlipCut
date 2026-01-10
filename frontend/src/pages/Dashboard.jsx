@@ -212,11 +212,11 @@ export default function Dashboard() {
 
   return (
     <div className="min-h-screen pt-24 pb-12 px-6 bg-black" data-testid="dashboard">
-      {/* Background */}
+      
       <div className="fixed inset-0 pointer-events-none dot-pattern opacity-30" />
 
       <div className="max-w-5xl mx-auto relative z-10">
-        {/* Header */}
+        
         <ScrollReveal>
           <div className="mb-10">
             <h1 className="text-3xl md:text-4xl font-semibold text-white mb-2">
@@ -228,7 +228,6 @@ export default function Dashboard() {
           </div>
         </ScrollReveal>
 
-        {/* Upload Zone */}
         <ScrollReveal delay={0.1}>
           <div
             {...getRootProps()}
@@ -293,7 +292,6 @@ export default function Dashboard() {
           </div>
         </ScrollReveal>
 
-        {/* Gallery */}
         <ScrollReveal delay={0.2}>
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-xl font-medium text-white flex items-center gap-2">
@@ -346,8 +344,7 @@ export default function Dashboard() {
                       alt={image.original_filename}
                       className="w-full h-full object-contain transition-transform duration-500 group-hover:scale-105"
                     />
-                    
-                    {/* Status Badge */}
+
                     <div className="absolute top-3 right-3">
                       {image.status === "PROCESSED" && (
                         <div className="bg-zinc-900/80 backdrop-blur-sm text-white px-2.5 py-1 rounded-full text-xs flex items-center gap-1.5 border border-zinc-700">
@@ -375,7 +372,6 @@ export default function Dashboard() {
                       )}
                     </div>
 
-                    {/* Hover Actions */}
                     <div className="absolute inset-0 bg-black/70 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center gap-2">
                       {image.processed_url && (
                         <>
@@ -431,7 +427,6 @@ export default function Dashboard() {
         )}
       </div>
 
-      {/* Delete Dialog */}
       <Dialog open={deleteDialog.open} onOpenChange={(open) => setDeleteDialog({ open, imageId: null })}>
         <DialogContent className="bg-zinc-900 border-zinc-800">
           <DialogHeader>
@@ -451,7 +446,6 @@ export default function Dashboard() {
         </DialogContent>
       </Dialog>
 
-      {/* Preview Dialog */}
       <Dialog open={!!selectedImage} onOpenChange={() => setSelectedImage(null)}>
         <DialogContent className="bg-zinc-900 border-zinc-800 max-w-3xl">
           <DialogHeader>

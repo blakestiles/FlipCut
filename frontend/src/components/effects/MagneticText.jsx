@@ -2,7 +2,6 @@ import React, { useRef, useState, useEffect } from 'react';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-// Magnetic Text - Letters move toward cursor
 export function MagneticText({ children, className }) {
   const ref = useRef(null);
   const x = useMotionValue(0);
@@ -39,7 +38,6 @@ export function MagneticText({ children, className }) {
   );
 }
 
-// Magnetic Character - Individual letter magnetic effect
 export function MagneticCharacter({ char, index, className }) {
   const ref = useRef(null);
   const [isHovered, setIsHovered] = useState(false);
@@ -90,7 +88,6 @@ export function MagneticCharacter({ char, index, className }) {
   );
 }
 
-// Magnetic Headline - Full text with magnetic letters
 export function MagneticHeadline({ text, className }) {
   return (
     <div className={cn('flex flex-wrap', className)}>

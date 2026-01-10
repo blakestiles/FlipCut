@@ -53,7 +53,7 @@ export function BeforeAfterSlider({
       onMouseDown={() => setIsDragging(true)}
       onTouchStart={() => setIsDragging(true)}
     >
-      {/* After Image (Background) */}
+      
       <div className="absolute inset-0 bg-checkered">
         <img
           src={afterImage}
@@ -66,7 +66,6 @@ export function BeforeAfterSlider({
         </span>
       </div>
 
-      {/* Before Image (Clipped) */}
       <div
         className="absolute inset-0 overflow-hidden"
         style={{ clipPath: `inset(0 ${100 - sliderPosition}% 0 0)` }}
@@ -84,7 +83,6 @@ export function BeforeAfterSlider({
         </span>
       </div>
 
-      {/* Slider Handle */}
       <div
         className="absolute top-0 bottom-0 w-1 bg-white shadow-[0_0_10px_rgba(255,255,255,0.5)]"
         style={{ left: `${sliderPosition}%`, transform: 'translateX(-50%)' }}

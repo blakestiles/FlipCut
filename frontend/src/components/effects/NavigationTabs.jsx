@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
-// Navigation Tabs with animated pill
 export function NavigationTabs({ tabs, activeTab, onChange, className }) {
   return (
     <div className={cn('flex items-center gap-1 p-1 rounded-full bg-zinc-900/50 border border-zinc-800', className)}>
@@ -29,7 +28,6 @@ export function NavigationTabs({ tabs, activeTab, onChange, className }) {
   );
 }
 
-// Spotlight Button
 export function SpotlightButton({ children, className, onClick, ...props }) {
   const [position, setPosition] = useState({ x: 0, y: 0 });
   const [isHovered, setIsHovered] = useState(false);
@@ -73,7 +71,6 @@ export function SpotlightButton({ children, className, onClick, ...props }) {
   );
 }
 
-// Outline Button
 export function OutlineButton({ children, className, onClick, ...props }) {
   return (
     <button

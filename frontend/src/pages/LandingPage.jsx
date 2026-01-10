@@ -11,11 +11,9 @@ import {
   Download,
   Shield,
   Globe,
-  X,
-  Heart
+  X
 } from "lucide-react";
 
-// Effects components
 import { MagneticHeadline } from "@/components/effects/MagneticText";
 import { ScrollReveal, StaggerReveal } from "@/components/effects/ScrollReveal";
 import { SpotlightButton, OutlineButton } from "@/components/effects/NavigationTabs";
@@ -54,7 +52,6 @@ const features = [
   }
 ];
 
-// Text Reveal Component for Thank You modal
 function TextRevealTitle({ text }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -86,7 +83,6 @@ function TextRevealWord({ children, progress, range }) {
   );
 }
 
-// Text Reveal for description
 function TextRevealDescription({ children }) {
   const ref = useRef(null);
   const { scrollYProgress } = useScroll({
@@ -118,7 +114,7 @@ export default function LandingPage() {
 
   return (
     <div className="min-h-screen bg-black text-white overflow-hidden" data-testid="landing-page">
-      {/* Thank You Modal for Uplane */}
+      
       <AnimatePresence>
         {showThankYou && (
           <motion.div
@@ -128,7 +124,7 @@ export default function LandingPage() {
             className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-sm"
             onClick={() => setShowThankYou(false)}
           >
-            {/* Close Button - Fixed Position */}
+            
             <button
               onClick={(e) => { e.stopPropagation(); setShowThankYou(false); }}
               className="fixed top-20 right-8 z-[110] p-3 rounded-full bg-white hover:bg-zinc-200 transition-colors shadow-lg"
@@ -137,7 +133,6 @@ export default function LandingPage() {
               <X className="w-5 h-5 text-black" />
             </button>
 
-            {/* Scrollable Content Container */}
             <div className="h-full overflow-y-auto py-8 px-4">
               <motion.div
                 initial={{ scale: 0.95, opacity: 0, y: 20 }}
@@ -147,7 +142,7 @@ export default function LandingPage() {
                 className="max-w-2xl mx-auto bg-zinc-900 border border-zinc-800 rounded-3xl p-8 md:p-12"
                 onClick={(e) => e.stopPropagation()}
               >
-                {/* Uplane Image */}
+                
                 <div className="flex justify-center mb-8">
                   <img 
                     src="https://customer-assets.emergentagent.com/job_flipcut-1/artifacts/z08veiz0_image.png"
@@ -158,11 +153,9 @@ export default function LandingPage() {
 
                 <div className="text-center space-y-6">
                   <div className="flex items-center justify-center gap-2 text-zinc-500 text-sm">
-                    <Heart className="w-4 h-4 text-red-500" />
                     <span>A Personal Note</span>
                   </div>
 
-                  {/* Text Reveal Title */}
                   <motion.h2
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -172,7 +165,6 @@ export default function LandingPage() {
                     Thank You, Uplane Team
                   </motion.h2>
 
-                  {/* Text Reveal Description */}
                   <motion.div
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -209,7 +201,7 @@ export default function LandingPage() {
                       transition={{ delay: 1.1 }}
                       className="text-white font-medium pt-4 text-center"
                     >
-                      I'm excited about the opportunity to speak with you soon! 🚀
+                      I'm excited about the opportunity to speak with you soon!
                     </motion.p>
                   </motion.div>
 
@@ -237,14 +229,13 @@ export default function LandingPage() {
         )}
       </AnimatePresence>
 
-      {/* Hero Section */}
       <section className="relative px-6 pt-32 pb-24 md:pt-40 md:pb-32">
-        {/* Background */}
+        
         <div className="absolute inset-0 dot-pattern opacity-50" />
         <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-white/[0.02] rounded-full blur-[100px]" />
 
         <div className="max-w-5xl mx-auto relative z-10">
-          {/* Magnetic Headline */}
+          
           <div className="mb-8">
             <ScrollReveal delay={0.1}>
               <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-semibold leading-[1.05] tracking-tight">
@@ -286,7 +277,6 @@ export default function LandingPage() {
             </div>
           </ScrollReveal>
 
-          {/* Stats */}
           <ScrollReveal delay={0.4}>
             <div className="flex flex-wrap gap-12 mt-16 pt-8 border-t border-zinc-900">
               <div>
@@ -306,7 +296,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Features Section */}
       <section id="features" className="px-6 py-24 bg-zinc-950">
         <div className="max-w-6xl mx-auto">
           <ScrollReveal>
@@ -339,7 +328,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works */}
       <section className="px-6 py-24">
         <div className="max-w-4xl mx-auto">
           <ScrollReveal>
@@ -375,7 +363,6 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* CTA Section */}
       <section className="px-6 py-24 bg-zinc-950">
         <ScrollReveal>
           <div className="max-w-3xl mx-auto text-center">
@@ -397,7 +384,6 @@ export default function LandingPage() {
         </ScrollReveal>
       </section>
 
-      {/* Footer */}
       <footer className="px-6 py-8 border-t border-zinc-900">
         <div className="max-w-6xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">

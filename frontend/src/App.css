@@ -1,6 +1,5 @@
-/* FlipCut Custom Styles */
 
-/* Upload zone styles */
+
 .upload-zone {
     position: relative;
     border: 2px dashed rgba(124, 58, 237, 0.3);
@@ -18,7 +17,6 @@
     transform: scale(1.02);
 }
 
-/* Image card hover effects */
 .image-card {
     transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
@@ -28,7 +26,6 @@
     box-shadow: 0 20px 40px -20px rgba(124, 58, 237, 0.3);
 }
 
-/* Action button styles */
 .action-btn {
     transition: background-color 0.2s ease, transform 0.2s ease;
 }
@@ -41,7 +38,6 @@
     transform: scale(0.95);
 }
 
-/* Processing steps indicator */
 .step-indicator {
     display: flex;
     align-items: center;
@@ -65,14 +61,12 @@
     background-color: #10b981;
 }
 
-/* Navbar styles */
 .navbar {
     backdrop-filter: blur(12px);
     background-color: rgba(5, 5, 5, 0.8);
     border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
-/* Hero gradient text */
 .gradient-text {
     background: linear-gradient(135deg, #7c3aed 0%, #06b6d4 100%);
     -webkit-background-clip: text;
@@ -80,7 +74,6 @@
     background-clip: text;
 }
 
-/* Pulse animation for processing */
 @keyframes pulse-glow {
     0%, 100% {
         box-shadow: 0 0 20px rgba(124, 58, 237, 0.3);
@@ -94,7 +87,6 @@
     animation: pulse-glow 2s ease-in-out infinite;
 }
 
-/* Skeleton loading */
 .skeleton {
     background: linear-gradient(
         90deg,
@@ -115,7 +107,6 @@
     }
 }
 
-/* Empty state */
 .empty-state {
     display: flex;
     flex-direction: column;
