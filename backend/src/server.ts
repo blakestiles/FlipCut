@@ -14,26 +14,48 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '8000', 10);
 
 const isProduction = process.env.NODE_ENV === 'production';
-const allowedOrigins = process.env.CORS_ORIGINS?.split(',')
+const corsOriginsEnv = process.env.CORS_ORIGINS || '';
+const allowedOrigins = corsOriginsEnv
+  .split(',')
   .map(origin => origin.trim())
-  .filter(origin => origin.length > 0) || 
-  (isProduction ? [] : ['http://localhost:3000', 'http://127.0.0.1:3000']);
+  .filter(origin => origin.length > 0);
+
+const allowAllOrigins = allowedOrigins.includes('*');
+
+console.log('CORS Configuration:', {
+  isProduction,
+  allowedOrigins,
+  allowAllOrigins,
+  corsOriginsEnv
+});
 
 app.use(cors({
   origin: (origin, callback) => {
+    if (allowAllOrigins) {
+      return callback(null, true);
+    }
+    
     if (!origin && !isProduction) {
       return callback(null, true);
     }
-    if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-      callback(null, true);
-    } else {
-      console.log(`CORS blocked origin: ${origin}. Allowed origins:`, allowedOrigins);
-      callback(new Error('Not allowed by CORS'));
+    
+    if (!origin) {
+      return callback(null, true);
     }
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    console.log(`CORS blocked origin: ${origin}. Allowed origins:`, allowedOrigins);
+    callback(new Error(`Not allowed by CORS. Origin: ${origin}`));
   },
   credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Session-ID'],
+  exposedHeaders: ['Set-Cookie'],
+  preflightContinue: false,
+  optionsSuccessStatus: 204
 }));
 
 app.use(cookieParser());

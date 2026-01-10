@@ -20,11 +20,12 @@ export async function getCurrentUser(req: AuthRequest): Promise<User | null> {
     return null;
   }
 
-  const db = getDatabase();
-  const sessionDoc = await db.collection('user_sessions').findOne(
-    { session_token: sessionToken },
-    { projection: { _id: 0 } }
-  );
+  try {
+    const db = getDatabase();
+    const sessionDoc = await db.collection('user_sessions').findOne(
+      { session_token: sessionToken },
+      { projection: { _id: 0 } }
+    );
 
   if (!sessionDoc) {
     return null;
