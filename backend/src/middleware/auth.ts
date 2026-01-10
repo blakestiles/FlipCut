@@ -27,25 +27,29 @@ export async function getCurrentUser(req: AuthRequest): Promise<User | null> {
       { projection: { _id: 0 } }
     );
 
-  if (!sessionDoc) {
+    if (!sessionDoc) {
+      return null;
+    }
+
+    const expiresAt = new Date(sessionDoc.expires_at);
+    if (expiresAt < new Date()) {
+      return null;
+    }
+
+    const userDoc = await db.collection('users').findOne(
+      { user_id: sessionDoc.user_id },
+      { projection: { _id: 0 } }
+    );
+
+    if (!userDoc) {
+      return null;
+    }
+
+    return userDoc as unknown as User;
+  } catch (error: any) {
+    console.error('getCurrentUser error:', error);
     return null;
   }
-
-  const expiresAt = new Date(sessionDoc.expires_at);
-  if (expiresAt < new Date()) {
-    return null;
-  }
-
-  const userDoc = await db.collection('users').findOne(
-    { user_id: sessionDoc.user_id },
-    { projection: { _id: 0 } }
-  );
-
-  if (!userDoc) {
-    return null;
-  }
-
-  return userDoc as unknown as User;
 }
 
 export async function requireAuth(
