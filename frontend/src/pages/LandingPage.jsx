@@ -230,10 +230,6 @@ export default function LandingPage() {
       </AnimatePresence>
 
       <section className="relative px-6 pt-32 pb-24 md:pt-40 md:pb-32">
-        
-        <div className="absolute inset-0 dot-pattern opacity-50" />
-        <div className="absolute top-1/3 left-1/4 w-[500px] h-[500px] bg-white/[0.02] rounded-full blur-[100px]" />
-
         <div className="max-w-5xl mx-auto relative z-10">
           
           <div className="mb-8">
