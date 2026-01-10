@@ -10,7 +10,7 @@ import LandingPage from "@/pages/LandingPage";
 import Dashboard from "@/pages/Dashboard";
 import AuthCallback from "@/components/AuthCallback";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
+const BACKEND_URL = process.env.REACT_APP_BACKEND_URL?.replace(/\/$/, '') || '';
 export const API = `${BACKEND_URL}/api`;
 
 export const apiClient = axios.create({

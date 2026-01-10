@@ -14,7 +14,9 @@ const app = express();
 const PORT = parseInt(process.env.PORT || '8000', 10);
 
 const isProduction = process.env.NODE_ENV === 'production';
-const allowedOrigins = process.env.CORS_ORIGINS?.split(',') || 
+const allowedOrigins = process.env.CORS_ORIGINS?.split(',')
+  .map(origin => origin.trim())
+  .filter(origin => origin.length > 0) || 
   (isProduction ? [] : ['http://localhost:3000', 'http://127.0.0.1:3000']);
 
 app.use(cors({
@@ -25,6 +27,7 @@ app.use(cors({
     if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
       callback(null, true);
     } else {
+      console.log(`CORS blocked origin: ${origin}. Allowed origins:`, allowedOrigins);
       callback(new Error('Not allowed by CORS'));
     }
   },
