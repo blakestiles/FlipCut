@@ -103,28 +103,15 @@ router.post('/session', async (req: Request, res: Response) => {
   }
 });
 
-router.get('/me', requireAuth, async (req: AuthRequest, res: Response) => {
-  try {
-    if (!req.user) {
-      res.status(401).json({ detail: 'Unauthorized' });
-      return;
-    }
-    
-    const user = req.user;
-    const response: AuthMeResponse = {
-      user_id: user.user_id,
-      email: user.email,
-      name: user.name,
-      picture: user.picture || null,
-    };
-    res.json(response);
-  } catch (error: any) {
-    console.error('Auth me error:', error);
-    console.error('Error stack:', error.stack);
-    res.status(500).json({ 
-      detail: error.message || 'Internal server error'
-    });
-  }
+router.get('/me', requireAuth, (req: AuthRequest, res: Response) => {
+  const user = req.user!;
+  const response: AuthMeResponse = {
+    user_id: user.user_id,
+    email: user.email,
+    name: user.name,
+    picture: user.picture,
+  };
+  res.json(response);
 });
 
 router.post('/logout', async (req: Request, res: Response) => {
