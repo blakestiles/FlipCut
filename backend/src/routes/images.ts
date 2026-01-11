@@ -157,7 +157,7 @@ router.post(
 router.post('/:image_id/process', requireAuth, async (req: AuthRequest, res: Response) => {
   try {
     const user = req.user!;
-    const imageId = req.params.image_id;
+    const imageId = Array.isArray(req.params.image_id) ? req.params.image_id[0] : req.params.image_id;
 
     const db = getDatabase();
     const imageDoc = await db.collection('images').findOne(
